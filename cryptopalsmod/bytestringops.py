@@ -164,8 +164,31 @@ def transpose_by_blocklength(bytestring, blocklength):
             increment += 1
         
         transpose.append(row)
-
     
     return transpose
 
-    
+def pad_pkcs7(bytestring, desired_length):
+    """Pads a bytes object until it is the desired length using PKCS#7 padding
+    scheme. The desired length must not over 255 more than the length of the
+    bytestring for the padding scheme to work. If otherwise thows an assertion
+    error.
+
+    Args:
+        bytestring (bytes): bytes object to be padded
+        desired_length (int): the desired length of the padded bytestring
+
+    returns:
+        bytes: the padded bytestring, has length desired_length
+    """
+    #If the bytestring is longer than the desired length, there is no padding 
+    #to be done.
+    if len(bytestring) >= desired_length:
+        return bytestring
+
+    assert desired_length - len(bytestring) <= 255
+
+    extra_padding_length = desired_length - len(bytestring)
+
+    extra_padding = bytes(extra_padding_length*[extra_padding_length])
+
+    return (bytestring + extra_padding)    
