@@ -191,4 +191,33 @@ def pad_pkcs7(bytestring, desired_length):
 
     extra_padding = bytes(extra_padding_length*[extra_padding_length])
 
-    return (bytestring + extra_padding)    
+    return bytestring + extra_padding
+
+def pad_by_multiple(bytestring, padding_multiple, extra_block = False):
+    """Pads a bytes object until its length is a multiple of padding_multiple
+    using pad_pkcs7 (PKCS#6). If extra_block = True, then there is always some
+    padding done, even if it means adding an extra block of length 
+    padding_mutiple.
+
+    Args:
+        bytestring(bytes): bytes object to be padded
+        padding_multiple(int): number to which the length of padded bytes is to 
+            be a multiple of
+        extra_block = False (bool): if set to True, some padding will be done,
+            even if it means adding an extra block of only padding to the 
+            message
+
+    returns:
+        bytes: padded bytestring
+    """
+
+    block_num = 0
+    while block_num*padding_multiple < len(bytestring):
+        block_num += 1
+
+    desired_length = block_num*padding_multiple
+
+    if extra_block and desired_length == len(bytestring):
+        desired_length += padding_multiple
+
+    return pad_pkcs7(bytestring, desired_length)
