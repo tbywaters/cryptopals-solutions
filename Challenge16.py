@@ -2,6 +2,7 @@ from cryptopalsmod.ciphers.aes_cbc import AES_CBC_random
 import cryptopalsmod.bytestringops as bso 
 import  cryptopalsmod.stringops as sops 
 
+
 class ChallengeCipher(AES_CBC_random):
     """Cipher designed specifically for this challenge. Encryption function
     takes strings as input, cleans meta character, prepends and appends the 

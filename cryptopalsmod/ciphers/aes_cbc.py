@@ -8,15 +8,22 @@ class AES_CBC:
         self.cipher = AES.new(key, AES.MODE_ECB)
         self.IV = initialistaion_vector
 
-    def encrypt(self, plaintext):
+    def encrypt(self, plaintext, IV = None):
         ciphertext = b''
+
+        #There is an option argument to change the IV. Added check that if an 
+        #IV has been entered, it has the same length as the origianl.
+        if IV == None:
+            IV = self.IV
+        else:
+            assert len(IV) == len(self.IV)
 
         #separate plaintext into blocks for encryption. Pad the last block
         plaintext_blocks = [plaintext[i: i+16] for i in range(0, len(plaintext), 16)]
         plaintext_blocks[-1] = bso.pad_pkcs7(plaintext_blocks[-1], 16)
 
         #CBC loop
-        previous = self.IV
+        previous = IV
         for block in plaintext_blocks:
             new_block_to_encrypt = bso.FixedXOR(block, previous)
             encrypted_block = self.cipher.encrypt(new_block_to_encrypt)
@@ -25,12 +32,20 @@ class AES_CBC:
 
         return ciphertext
 
-    def decrypt(self,ciphertext):
+    def decrypt(self, ciphertext, IV = None):
 
         ciphertext_blocks = [ciphertext[i:i+16] for i in range(0, len(ciphertext), 16)]
         #ciphertext should not need padding or something has gone wrong
         
-        previous = self.IV
+        #There is an option argument to change the IV. Added check that if an 
+        #IV has been entered, it has the same length as the origianl.
+        if IV == None:
+            IV = self.IV
+        else:
+            assert len(IV) == len(self.IV)
+
+
+        previous = IV
 
         plaintext = b''
         #CBC loop

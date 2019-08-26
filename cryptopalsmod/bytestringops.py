@@ -64,7 +64,7 @@ def FixedXOR(bytestring1, bytestring2):
     #in one of the cryptopals challenges
     assert len(bytestring1) == len(bytestring2)
 
-    output = bytearray([byte1^byte2 for (byte1, byte2) in zip(bytestring1, bytestring2)])
+    output = bytes([byte1^byte2 for (byte1, byte2) in zip(bytestring1, bytestring2)])
 
     return output
 
