@@ -1,5 +1,6 @@
 from Crypto.Cipher import AES 
 import cryptopalsmod.bytestringops as bso 
+import secrets
 
 
 class AES_CBC:
@@ -41,3 +42,10 @@ class AES_CBC:
             previous = block
         
         return plaintext 
+
+
+class AES_CBC_random(AES_CBC):
+    """Implements AES_CBC but with a random key and iniaialisation vector. 
+    Useful for simulating an oracle"""
+    def __init__(self):
+        AES_CBC.__init__(self, secrets.token_bytes(16), secrets.token_bytes(16))
