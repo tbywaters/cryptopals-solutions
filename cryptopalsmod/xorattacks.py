@@ -1,3 +1,6 @@
+"""A collection of functions used for atting XOR based encryptions. Used for
+solving cryptopals challenges"""
+
 import cryptopalsmod.bytestringops as bso
 import itertools
 import random

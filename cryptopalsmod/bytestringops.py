@@ -1,3 +1,6 @@
+""" A collection of functions which are used for manipulating bytes when
+solving the cryptopals challenges"""
+
 import base64
 import bitarray
 
@@ -221,3 +224,23 @@ def pad_by_multiple(bytestring, padding_multiple, extra_block = False):
         desired_length += padding_multiple
 
     return pad_pkcs7(bytestring, desired_length)
+
+def remove_padding_pkcs7(bytestring):
+    """Determines wether a string has been padded correctly using PKCS#7. A
+    message that has not been padded it unlikely to have valid padding. If
+    the massage has been padded correctly, removes the padding. Otherwise thows
+    an exception"""
+
+    last_byte = bytestring[-1]
+    invalid_padding_error = Exception('Invalid padding')
+    
+    if last_byte > len(bytestring):
+        raise invalid_padding_error
+    
+    padding = bytestring[-last_byte:]
+    for byte in padding:
+        if byte != bytestring[-1]:
+            raise invalid_padding_error
+
+    return bytestring[:-last_byte]
+
