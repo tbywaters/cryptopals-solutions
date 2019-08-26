@@ -50,23 +50,32 @@ def detect_ECB(ciphertext, blocklength = 16):
 def determine_ECB_keylength(oracle):
     """Takes in an ECB oracle an encrypt method (written with 
     cryptopadmod.ciphers.aes_ecb.AES_ECB cipher in mind) and determines 
-    the length of the key used for encryption. Assumes the oracle does not
-    prepad the input
+    the length of the key used for encryption. 
     
     Args:
         oracle (AES_ECB): an oracle which encripts with AES in ECB mord
     Returns 
         int: key length in bytes, either 16 or 32. Returns -1 if the test fails
     """
+    #Possible AES keylengths
     key_lengths = [16, 32]
+
     for key_length in key_lengths:
+    
+        #We will add in repeated characters and count the number of repeating blocks
+        #We then compare this to the original number of repeated blocks
+        initial_num_repeated_blocks = num_of_repeats(oracle.encrypt(b''), key_length)
+    
         for byte in range(0,255):
-        
-            prefix = bytes(2*key_length*[byte])
             
-            encryption = oracle.encrypt(prefix)
-              
-            if encryption[:key_length] != encryption[key_length:2*key_length]:
+            #This is the shortest distance guarenteed to give a repeated block
+            #for this keylength
+            test_length = 3*key_length - 2
+            
+            test_string = bytes(test_length*[byte])
+            ciphertext = oracle.encrypt(test_string)
+            current_num_repeats = num_of_repeats(test_string, key_length)
+            if current_num_repeats <= initial_num_repeated_blocks:
                 break
             return key_length
 
