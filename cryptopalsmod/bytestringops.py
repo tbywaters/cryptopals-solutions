@@ -97,6 +97,19 @@ def repeatedXOR(bytestring1, bytestring2):
     
     return output
 
+def zipXOR(bytestring1, bytestring2):
+    """Takes two bytes like objects of and returns a bytes object of
+    the XOR, shortening the longer of the two inputs.
+     
+     Args:
+        bytestring1(bytes): argument of XOR
+        bytestring2(bytes): argument of XOR
+
+    returns:
+        bytes: bytewise XOR of bytesting1 and bytestring2
+    """
+    return bytes([byte1^byte2 for (byte1, byte2) in zip(bytestring1, bytestring2)])
+    
 def bytes_to_bits(bytestring):
     """Takes a bytes like object and returns a bitarray
     
