@@ -103,3 +103,24 @@ def padding_oracle_decrypt_last_block(ciphertext, IV, padding_oracle, blocklengt
     plaintext = bso.FixedXOR((IV + ciphertext)[-32:-16], decrypted) 
 
     return plaintext
+
+def IV_equals_key(decrypt, ciphertext = None):
+    """Obtains the IV from a cipher using it's decrypt function assuming that
+    this function raises an exception if given a ciphertext that does not decrypt
+    to valid ASCII and the message in the exception contains plaintext as the
+    initial segment. Ciphertext is altered to to get the key and needs to be at
+    least 48 bytes (Maybe not. What if we thow anything in there? should be fine)
+    as long as padding is not checked.
+    """
+
+    #One of these values will give invalid ASCII
+    for byte in range(0,256):
+        new_ciphertext = ciphertext[:16] + bytes(16*[0]) + ciphertext[:16] + bytes(16*[byte]) + ciphertext[-32:]
+        try:
+            decrypt(new_ciphertext)
+        except Exception as e:
+            messed_up_plaintext = e.args[0]
+            key = bso.FixedXOR(messed_up_plaintext[:16], messed_up_plaintext[32:48])
+            break
+    
+    return key
