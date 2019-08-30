@@ -1,5 +1,6 @@
 import time
 from cryptopalsmod.random.mersenne_twister import MT19937
+from cryptopalsmod.ciphers.mt_cipher import MTCipher
 
 
 def test_recent_timestamps(output, output_number = 1, max_seconds_to_check = 5000, start_time = None):
@@ -142,18 +143,16 @@ def clone_mersenne_twister(tempered_state):
 
     return new_twister
 
-def brute_attack(output, output_start, key_values = None):
-    """Brute force attack MTCipher. Requires a list of successive known values
-    in the keystream and the position of the first of these values in the
-    stream. Returns the seed.
+def brute_attack(ciphertext, known_plaintext, key_values = None):
+    """Brute force attack MTCipher. Requires a known chunk plaintext. The more
+    the better. Returns the seed.
 
     Note: There is more than one way to build a keystream cipher using MT. This
-    function assumes that the cipher takes the lowest 8 bits of numbers generated
-    by MT as the keystream. 
+    function uses mt_cipher.
 
     Args:
-        output (bytes): list of bytes used in the keystream
-        output_start (int): index of the first value of output in the keystream
+        ciphertext (bytes): ciphertext encrypted by cipher
+        known_plaintext (bytes): know plaintext
         key_values (list<int>) = None. List of key values to check. If None, is
         set to range(1, 2**32)
     
@@ -167,29 +166,11 @@ def brute_attack(output, output_start, key_values = None):
         key_values = range(1, 2**32)
 
     for seed in key_values:
-        prng = MT19937(seed)
+        mt_cipher = MTCipher(seed)
         
-        
-        rand_num = []
+        test_plaintext = mt_cipher.decrypt(ciphertext)
 
-        while len(rand_num) < len(output) + output_start:
-
-            #Cipher does not take the whole random number, only the lowest 8 bits
-            # hece we need to do the same to find the seed
-            new_num = prng.extract_number() & ((1<<8) - 1)
-            rand_num.append(new_num)
-
-        #We only care about the keystream in the same position as the known output
-        rand_num = rand_num[-len(output):]
-        
-        #look for a match
-        match = True
-        for (num, out) in zip(rand_num, output):
-            if num != out:
-                match = False
-                break
-        
-        if match:
+        if known_plaintext in test_plaintext:
             return seed
         
     raise Exception('Seed not found')
