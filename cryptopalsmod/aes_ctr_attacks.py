@@ -1,4 +1,4 @@
-
+import cryptopalsmod.bytestringops as bso
 
 def fixed_nonce_attack(ciphertexts):
     """Takes a number of list of ciphertexts encrypted independently using the 
@@ -29,3 +29,27 @@ def fixed_nonce_attack(ciphertexts):
         previous = key_length
     
     return key
+
+
+def read_write_attack(ciphertext, edit):
+    """Decrypts a ciphertext using a function edit.
+    
+    Args:
+        ciphertext (bytes): ciphertext to be decrypted
+        edit (function object): edit(ciphertext (bytes), offset (int), newtext)
+            if plaintext is the decryption of ciphertext, then edit returns 
+            encryption of plaintext but replacing the text starting at offset 
+            with newtext. Must use same key and nonce as ciphertext
+    
+    returns:
+        bytes: decrypted ciphertext
+
+    """
+    
+    dummy_plaintext = bytes(len(ciphertext)*[0])
+    
+    #encrypting dummy_plaintext gives the keystream
+
+    keystream = edit(ciphertext, 0, dummy_plaintext)
+
+    return bso.FixedXOR(keystream, ciphertext)

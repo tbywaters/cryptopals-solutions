@@ -1,13 +1,14 @@
 from Crypto.Cipher import AES
 import struct
 import cryptopalsmod.bytestringops as bso
+import secrets
 
 class AES_CTR(object):
     def __init__(self, key, nonce, counter_start = 0):
         """Initialise the cipher.
 
         Args:
-            key (bytes): sectret key to be used, lenmgth 16
+            key (bytes): sectret key to be used, length 16
             nonce (int): used in encryption
             counter_start (int): initial values of counter used in encryption.
         """
@@ -48,3 +49,20 @@ class AES_CTR(object):
             self.counter = reset_counter
 
         return encryption
+
+    def edit(self, ciphertext, offset, new_text):
+
+        """takes an encrypted by changes the plaintext at position offset to 
+        be new_text. Returns the new encrypted ciphertext"""
+
+        old_plaintext = self.encrypt_decrypt(ciphertext[:offset + len(new_text)], 0)
+        new_plaintext = old_plaintext[:offset] + new_text
+        new_ciphertext = self.encrypt_decrypt(new_plaintext, 0) + ciphertext[offset + len(new_text):]
+        return new_ciphertext
+
+class AES_CTR_random(AES_CTR):
+    """ An AES_CTR but with random key and nonce"""
+    def __init__(self):
+        nonce = secrets.randbelow(2**(4*16))
+        key = secrets.token_bytes(16)
+        AES_CTR.__init__(self, key, nonce)
