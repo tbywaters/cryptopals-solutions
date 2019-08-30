@@ -1,5 +1,5 @@
-from cryptopalsmod.random.mersenne_twister import MT19937
 from cryptopalsmod import mersenne_twister_attacks as mt_attacks
+from cryptopalsmod.random.mersenne_twister import MT19937
 import time
 import random
 

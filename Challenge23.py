@@ -3,11 +3,11 @@ from cryptopalsmod import mersenne_twister_attacks as mt_attacks
 import time
 
 def main():
-    
+
     random_twister = MT19937(int(time.time()))
 
-
     outputs = []
+    
     while len(outputs) < 624:
         outputs.append(random_twister.extract_number())
 

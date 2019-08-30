@@ -1,5 +1,3 @@
-import bitarray
-import base64
 
 #TODO: Possibly belongs somewhere else
 def lowest_bits(number, number_of_bits):
