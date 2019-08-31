@@ -1,31 +1,40 @@
 import hashlib
-def _preprocess(message):
-    #Formating b'' seems finicky. Working with normal strings instead.    
+
+def left_rotate(x, n, w):
+    return ((x<< n & (2 ** w - 1)) | (x >> w - n))
+
+def sha_padding(message):
+    """Takes a message and returns the padding as a string of bits that would 
+    be used for SHA1
+    
+    Args: 
+        message (bytes): bytes to be padded
+
+    returns:
+        str: the string of bits which would be added to message for sha
+    """
+
     message_bit_string = ''.join([format(byte, '08b') for byte in message])
     
     ml = len(message_bit_string)
 
     #We need to pad the message such that the legnth in bits is 448 mod 512. 
-    #Padding is a 11 followed by 0's.
+    #Padding is a 1 followed by 0's.
     
     # Add the 1     
-    message_bit_string += '1'
+    padding= '1'
 
     #Calculate the number of 0 bits required and add to message
-    num_zeros = (448 - (len(message_bit_string) % 512)) % 512
+    num_zeros = (448 - (len(message_bit_string) + 1 % 512)) % 512
 
-    message_bit_string += num_zeros*'0'
+    padding += num_zeros*'0'
 
     #add the length of the original message as a 64 bits 
-    message_bit_string += format(ml, '064b')
+    padding += format(ml, '064b')
     
-    assert len(message_bit_string) % 512 == 0
+    assert len(message_bit_string + padding) % 512 == 0
 
-    return message_bit_string
-
-def left_rotate(x, n, w):
-    return ((x<< n & (2 ** w - 1)) | (x >> w - n))
-
+    return padding
 
 def SHA1(message):
     """Implementation o SHA1 based in wikipedias pseudocode.
@@ -41,9 +50,9 @@ def SHA1(message):
     h = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]
 
     #Preprocessing
-    processed_message = _preprocess(message)
+    message = ''.join([format(byte, '08b') for byte in message]) + sha_padding(message)
 
-    chunks = [processed_message[i: i + 512] for i in range(0, len(message), 521)]
+    chunks = [message[i: i + 512] for i in range(0, len(message), 521)]
 
     #Process each chunk
     for chunk in chunks:
@@ -98,7 +107,7 @@ def SHA1(message):
     
 def sha1_key_msg_MAC(key, message):
     return SHA1(key + message)
-    
+
 def main():
     assert SHA1(b'abc') == hashlib.sha1(b'abc').digest()
 
