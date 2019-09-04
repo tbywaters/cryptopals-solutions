@@ -17,10 +17,12 @@ class AES_CBC:
             IV = self.IV
         else:
             assert len(IV) == len(self.IV)
+        
+        #Always pad plaintext so that padding can be checked for validity
+        plaintext = bso.pad_by_multiple(plaintext, 16, extra_block=True)
 
-        #separate plaintext into blocks for encryption. Pad the last block
+        #separate plaintext into blocks for encryption.
         plaintext_blocks = [plaintext[i: i+16] for i in range(0, len(plaintext), 16)]
-        plaintext_blocks[-1] = bso.pad_pkcs7(plaintext_blocks[-1], 16)
 
         #CBC loop
         previous = IV
