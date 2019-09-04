@@ -257,3 +257,16 @@ def remove_padding_pkcs7(bytestring):
 
     return bytestring[:-last_byte]
 
+def int_to_bytes(number):
+    """Converts a number to a bytes object with as small a length as possible
+    """
+
+    start_length = 1
+    while True:
+        try:
+            return number.to_bytes(start_length, byteorder='big')
+        except OverflowError:
+            start_length += 1
+        
+
+

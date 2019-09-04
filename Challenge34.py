@@ -34,11 +34,7 @@ def diffiehellman_mitm_sim(prime, base):
 
     alice['dh'].gen_shared_key(key_for_alice)
     
-    #Need a way to convert the shared key into bytes. Converting to hex and then 
-    #bytes seems as good right now
-    
-
-    alice['sha1'] = SHA1(bytes.fromhex(hex(alice['dh'].shared_key).lstrip('0x')))
+    alice['sha1'] = SHA1(bso.int_to_bytes(alice['dh'].shared_key))
     alice['cipher'] = AES_CBC(alice['sha1'].digest()[:16], secrets.token_bytes(16))
     alice_ciphertext = alice['cipher'].encrypt(b'Message to Bob')
     alice_ciphertext += alice['cipher'].IV
@@ -47,7 +43,7 @@ def diffiehellman_mitm_sim(prime, base):
      
     #Bob recieves the ciphertext, decrypts it and send a reply.
 
-    bob['sha1'] = SHA1(bytes.fromhex(hex(bob['dh'].shared_key).lstrip('0x')))
+    bob['sha1'] = SHA1(bso.int_to_bytes(bob['dh'].shared_key))
     bob['cipher'] = AES_CBC(bob['sha1'].digest()[:16], secrets.token_bytes(16))
     bob_ciphertext = bob['cipher'].encrypt(b'Message to Alice')
     bob_ciphertext += bob['cipher'].IV
@@ -80,7 +76,7 @@ def main():
     ciphertext_a2b = connection.send(prime)
 
     # decrypt
-    malcolm = AES_CBC(SHA1(bytes.fromhex(hex(0).lstrip('0x'))).digest()[:16], b'0'*16)
+    malcolm = AES_CBC(SHA1(bso.int_to_bytes(0)).digest()[:16], b'0'*16)
     messages = []
     messages.append(bso.remove_padding_pkcs7(malcolm.decrypt(ciphertext_a2b[:-16], ciphertext_a2b[-16:])))
 
