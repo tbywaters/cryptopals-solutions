@@ -8,7 +8,7 @@ import time
 class ChallengeCipher(MTCipher):
     def __init__(self):
         seed = secrets.randbelow(2**16)
-        MTCipher.__init__(self, 4)
+        MTCipher.__init__(self, seed)
 
     def encrypt(self, plaintext):
         num_bytes = secrets.randbelow(32)
@@ -31,7 +31,6 @@ def main():
     
     ## pasword_simulation
     key = int(time.time())
-    print(key.bit_length())
     pasword_token_plaintext = b'random_username' + b'password_reset'
     cipher = MTCipher(key)
 
