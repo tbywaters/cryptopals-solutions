@@ -8,6 +8,7 @@ class DiffieHellman:
         self.prime = prime
         self.base = base
         self.secret_key = secret_key
+        self.shared_key = None
 
     def set_secret_key(self, secret_key):
         self.secret_key = secret_key
@@ -21,5 +22,5 @@ class DiffieHellman:
     def gen_shared_key(self, public_key):
         if self.secret_key == None:
             raise Exception('Need to set secret key before calculating shared key')
-        return numbers.modexp(public_key, self.secret_key, self.prime)
-        
+        self.shared_key = numbers.modexp(public_key, self.secret_key, self.prime)
+        return self.shared_key
