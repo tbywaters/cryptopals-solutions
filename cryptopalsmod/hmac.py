@@ -1,5 +1,4 @@
 from cryptopalsmod import bytestringops as bso
-from cryptopalsmod import hmac
 
 def hmac(key, message, hash_function, blocksize, outputsize):
     """Implementation of HMAC based on wikipedia pseudocode
