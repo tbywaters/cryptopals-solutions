@@ -5,7 +5,7 @@ from hashlib import sha256
 import cryptopalsmod.bytestringops as bso
 
 
-class SRPClient():
+class SimplifiedSRPClient():
     """Implementation of a client validitating their password using SRP"""
 
     def __init__(self, user_data):
@@ -26,23 +26,20 @@ class SRPClient():
         self.public_key = 0
         self.prime = 0
         self.base = 0
-        self.k = 0
         self.salt = 0
         self.secret_key = 0
     
-    def recv_public_params(self, prime, base, k):
+    def recv_public_params(self, prime, base):
         """Saves Diffie Hellman paramaters which are usually sent by the client.
         Then randomly chooese a secret key.
 
         Args:
             prime (int): prime used in SRP
             base (int): base used in SRP
-            k (int): k-value used in SRP
         """
 
         self.prime = prime
         self.base = base
-        self.k = k
 
         #With prime now decided upon, we can compute the secret key
         self._set_secret_key()
@@ -67,17 +64,19 @@ class SRPClient():
         self.public_key = modexp(self.base, self.secret_key, self.prime)
         return self.user_email, self.public_key
 
-    def recv_dh_public_key(self, salt, server_public_key):
+    def recv_dh_public_key(self, salt, server_public_key, u):
         """Taks as an input the salt and public key from the server
 
         Args:
             salt (int): random salt decided on by the server
             server_public_key (int): SRP public key calculated byt the server
+            u (int): used in calculating hash
         """
         #saves arguments
         self.server_public_key = server_public_key
         self.salt = salt
-        
+        self.u = u
+
         return
 
     def calculate_hmac(self):
@@ -88,10 +87,8 @@ class SRPClient():
             bytes: hmac depending on password, salt and server and client keys
         
         """
-        u = sha256(bso.int_to_bytes(self.public_key) + bso.int_to_bytes(self.server_public_key)).hexdigest()
-        u = int(u, 16)
 
-        #conver salt to bytes for hashing
+        #convert salt to bytes for hashing
         salt_bytes = bso.int_to_bytes(self.salt)
         
         password_exp = sha256(salt_bytes + self.user_password).hexdigest()
@@ -99,9 +96,8 @@ class SRPClient():
         
         
         #Calculating the key for hmac
-        S_base = (self.server_public_key - self.k * modexp(self.base, password_exp, self.prime)) % self.prime
-        S_exponent = (self.secret_key + u * password_exp) % self.prime
-        S = modexp(S_base, S_exponent, self.prime)
+        S_exponent = (self.secret_key + self.u * password_exp) % self.prime
+        S = modexp(self.server_public_key, S_exponent, self.prime)
         
         hmac_key = sha256(bso.int_to_bytes(S)).digest()
 
@@ -109,7 +105,7 @@ class SRPClient():
         
         return calc_hmac
 
-class SRPClient_HTTP(SRPClient):
+class SimplifiedSRPClient_HTTP(SimplifiedSRPClient):
     """Same as SRPserver but arguement and return values are converted to and 
     from bytes for use with a http server. Observe that __init__ remains unchanged
     and so username and password need to be given as bytes objects
@@ -134,6 +130,6 @@ class SRPClient_HTTP(SRPClient):
             and server and client keys
         """
 
-        return bso.bytes_to_hex(SRPClient.calculate_hmac(self))
+        return bso.bytes_to_hex(SimplifiedSRPClient.calculate_hmac(self))
 
 
