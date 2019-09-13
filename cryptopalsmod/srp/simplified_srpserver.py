@@ -5,16 +5,14 @@ from hashlib import sha256
 import cryptopalsmod.bytestringops as bso
 
 class SimplifiedSRPServer():
-    """Implementation of SRP verification"""
+    """Implementation of the server part of a simplified SRP verification"""
 
     def __init__(self, user_data, prime = NIST_PRIME, base = 2):
         """Initialises with required information
-
         Args:
             prime (int): prime used for dh
             base (int): base used for dh
-            k (int): used to disuise password hash in public key
-            userdata (tuple(bytes, bytes)): tuple of (user email, user password)
+            user_data (tuple(bytes, bytes)): tuple of (user email, user password)
         """
         self.prime = prime
         self.base = base
@@ -30,7 +28,7 @@ class SimplifiedSRPServer():
         # base and retrieved when the user sends their email
 
         self.reset_keys()
-        
+    
     def reset_keys(self):
         """Reset sectret and public keys to a random/0 value."""
 
@@ -82,7 +80,7 @@ class SimplifiedSRPServer():
 
         #key calculaton
         self.public_key = modexp(self.base, self.secret_key, self.prime)
-        self.u = int.from_bytes(secrets.token_bytes(8), 'big')
+        self.u = secrets.randbelow(2**129)
 
         return self.salt, self.public_key, self.u
 
@@ -96,7 +94,7 @@ class SimplifiedSRPServer():
 
         #Check that the emails match. In an actual implementation, this function
         #could retreive the hashed password (see _password_computation()) using
-        # the email as the database key
+        #the email as the database key
 
         if submitted_email != self.user_email:
             return 'Emails do not match', 400
@@ -117,7 +115,7 @@ class SimplifiedSRPServer():
             string, int: 'OK', 200 if the verification is successful
                         'Nope', 400 if the verification is unsuccessful
         """
- 
+
         S = modexp(self.client_public_key * modexp(self.v, self.u, self.prime), self.secret_key, self.prime)
         
         hmac_key = sha256(bso.int_to_bytes(S)).digest()
@@ -170,3 +168,4 @@ class SimplifiedSRPServer_HTTP(SimplifiedSRPServer):
  
         recv_hmac = bso.hex_to_bytes(recv_hmac)
         return SimplifiedSRPServer.verify_hmac(self, recv_hmac)
+

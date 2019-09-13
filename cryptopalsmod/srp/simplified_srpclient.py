@@ -70,7 +70,8 @@ class SimplifiedSRPClient():
         Args:
             salt (int): random salt decided on by the server
             server_public_key (int): SRP public key calculated byt the server
-            u (int): used in calculating hash
+            u (int): used in calculating hash. A random int calculated byt the 
+                server
         """
         #saves arguments
         self.server_public_key = server_public_key
