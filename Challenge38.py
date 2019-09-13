@@ -12,8 +12,9 @@ from cryptopalsmod.hmac import hmac
 
 def main():
 
-    #To work, user data needs to match user data in Challenge38_server.py
-    user_data = (b'foo@bar.com', b'password')
+    #To work, user data needs to match user data in Challenge38_server.py. The
+    #earlier in the dictionary the password is, the quicker it will run
+    user_data = (b'foo@bar.com', b'abdominohysterectomy')
 
     #Test that the simplified SRP works as expected when used legitimately
     legitimate_server_response = test_server(user_data, 'http://127.0.0.1:5000/')

@@ -1,5 +1,6 @@
 """Server implementation of a simplified and flawed SRP as well as a malicious
-server which pretends to run simplified srp but instead stores the HMAC for cracking."""
+server which pretends to run simplified srp but instead stores the HMAC for cracking.
+For the simulation to work, user_data needs to match user_data in Challenge38.py"""
 
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
@@ -10,7 +11,7 @@ from cryptopalsmod.srp.malicious_srp import MaliciousSRPServer_HTTP
 app = Flask(__name__)
 api = Api(app)
 
-user_data = (b'foo@bar.com', b'password')
+user_data = (b'foo@bar.com', b'abdominohysterectomy')
 
 parser = reqparse.RequestParser()
 parser.add_argument('email')
