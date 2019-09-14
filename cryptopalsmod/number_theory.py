@@ -67,10 +67,65 @@ def gcd(a, b):
    _, _, g = extended_euc(a,b)
    return g
 
+def chinese_remainder_theorem(congruences, moduli):
+   """Solves x = c_i mod n_i where congruences = [c_0, c_1,...],
+   moduli = [n_0, n_1,...] and x>0 is smaller than the product of all moduli.
+   Assumes that all the moduli are coprime.
+
+   Args:
+      congruences (List<int>)
+      moduli (List<int>)
+   returns:
+      x (int)
+   raises:
+      Exception('differing number of congruences and moduli') if there are
+      are differing numbers of moduli and congruences
+      Exception('moduli are not coprime') if the moduli are not coprime
+   """
+   if len(moduli) != len(congruences):
+      raise Exception('differing number of congruences and moduli')
+
+   #N is the product of all moduli
+   N = 1
+   for mod in moduli:
+      N = N*mod
+
+   #Construct the solution. Wikipedia (Vhinese remainder theorem) gives a good
+   #explanation
+
+   bez_coeffs = []
+   for mod in moduli:
+      a, _, g = extended_euc(N//mod, mod)
+      if g > 1:
+         raise Exception('moduli are not coprime')
+      bez_coeffs.append(a)
+
+   x = 0
+   for cong, mod, bez in zip(congruences, moduli, bez_coeffs):
+      x += cong*N*bez//mod
+
+   return x % N
+
+def newton_root(k, N):
+   """Return greatest integer x such that x**k <= N by using Newtons method."""
+   u, s = N, N+1
+   while u < s:
+      s = u
+      t = (k-1) * s + N // pow(s, k-1)
+      u = t // k
+   return s
+
+
 def main():
    assert modexp(3, 3, 5) == 2
    assert invmod(17, 3120) == 2753
    assert invmod(2, 15) == 8
+
+
+   congruences = [0, 3, 4]
+   moduli = [3, 4 , 5]
+
+   assert chinese_remainder_theorem(congruences, moduli) == 39
 
 if __name__ == "__main__":
    main()
