@@ -6,7 +6,7 @@ from cryptopalsmod import bytestringops as bso
 
 SHA256_asn1 = '3031300D060960864801650304020105000420'
 
-class DSASignatory(rsa.RSAServer):
+class FakeDSASignatory(rsa.RSAServer):
     """Gives capability to sign a message using RSA. Only uses SHA256 for 
     hashing"""
     
@@ -36,7 +36,7 @@ class DSASignatory(rsa.RSAServer):
 
         return int(sig_block, 16)
 
-class DSAVerify(rsa.RSAClient):
+class FakeDSAVerify(rsa.RSAClient):
     def bad_verify_message(self, message, signature):
         """Verifies a signature by decrypting and checking the signature (in hex)
         starts with '0001ff' and contains the correct ans1 for sha16 and hash
@@ -49,7 +49,7 @@ class DSAVerify(rsa.RSAClient):
             bool: True if the signature passes the verification
         raises:
             Exception('Signiture is invalid'): if the signature does not pass validation
-        
+        """
         message_hash = sha256(message).hexdigest()
         signature = rsa.RSAClient.encrypt(self, signature)
 

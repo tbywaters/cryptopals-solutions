@@ -1,12 +1,12 @@
-from cryptopalsmod.ciphers import dsa
+from cryptopalsmod.ciphers import dsa_fake
 from hashlib import sha256
 import cryptopalsmod.number_theory as nt
 
 def main():
     
     #verify the dsa algorithm works
-    verify = dsa.DSAVerify()
-    signatory = dsa.DSASignatory()
+    verify = dsa_fake.FakeDSAVerify()
+    signatory = dsa_fake.FakeDSASignatory()
     verify.recv_public_key(*signatory.send_public_key())
 
     message = b'hi mum'
