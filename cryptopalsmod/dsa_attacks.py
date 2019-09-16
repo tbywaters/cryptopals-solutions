@@ -54,7 +54,7 @@ class DSAattacks():
 
     def test_nonce(self, nonce, message, r, s):
         """Tests is a nonce gives the desired signature for a message"""
-        
+
         message_int = int(self.hash(message).hexdigest(), 16)
 
         test_r = nt.modexp(self.g, nonce, self.p) % self.q
@@ -72,3 +72,34 @@ class DSAattacks():
                 return secret_key
         
         return 0
+    
+    def key_from_double_signing(self, msg_dict1, msg_dict2):
+        """Tries to calculate the nonce from a pair of messages that were encoded
+        from the same key. If the nonce is correct, returns the secret key
+
+        Args:
+            msg_dict1 (dict): a distionary with fields
+                'msg' (bytes): the message which has been signed
+                'r' (int): the r value in the signature
+                's' (int): the s value in the signature
+            msg_dict2 (dict): see msg_dict1
+
+        returns 
+            int: secret key used for signing
+        """
+        nonce = self.nonce_from_double_signing(msg_dict1['msg'], msg_dict1['s'],
+                                                msg_dict2['msg'], msg_dict2['s'])
+        
+        return self.test_nonce(nonce, msg_dict1['msg'], msg_dict1['r'], msg_dict1['s'])
+
+    def nonce_from_double_signing(self, message1, s1, message2, s2):
+        """Computes the nonce from two message signed witht the same nonce"""
+
+        msg_hash1 = int(self.hash(message1).hexdigest(), 16) 
+        msg_hash2 = int(self.hash(message2).hexdigest(), 16)
+
+        numerator = (msg_hash1 - msg_hash2) % self.q
+
+        denominator = nt.invmod((s1 - s2) % self.q, self.q)
+
+        return (numerator * denominator) % self.q 
