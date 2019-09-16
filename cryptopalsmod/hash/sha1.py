@@ -98,10 +98,12 @@ class SHA1(object):
 
     def digest(self):
         return struct.pack('>IIIII', self.h[0], self.h[1], self.h[2], self.h[3], self.h[4])
+    def hexdigest(self):
+        return self.digest().hex()
 
 def main():
     
-    assert SHA1(b'abc').digest() == hashlib.sha1(b'abc').digest()
+    assert SHA1(b'abc').hexdigest() == hashlib.sha1(b'abc').hexdigest()
 
 if __name__ == '__main__':
     main()
