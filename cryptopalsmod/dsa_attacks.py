@@ -93,7 +93,7 @@ class DSAattacks():
         return self.test_nonce(nonce, msg_dict1['msg'], msg_dict1['r'], msg_dict1['s'])
 
     def nonce_from_double_signing(self, message1, s1, message2, s2):
-        """Computes the nonce from two message signed witht the same nonce"""
+        """Computes the nonce from two message signed with the same nonce"""
 
         msg_hash1 = int(self.hash(message1).hexdigest(), 16) 
         msg_hash2 = int(self.hash(message2).hexdigest(), 16)
