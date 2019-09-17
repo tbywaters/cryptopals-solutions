@@ -23,4 +23,38 @@ def hastad_attack(e, ciphertexts, public_keys):
     message_e_power = nt.chinese_remainder_theorem(ciphertexts, public_keys)
 
     return nt.newton_root(e, message_e_power)
-    
+
+def parity_oracle_attack(ciphertext, e, modulus, parity_oracle):
+    """Cracks an rsa ciphertext using a parity oracle
+
+    Args:
+        cipehertext (int): encrypted plaintext for decryption
+        e (int): public exponent used in rsa
+        moduls (int): Modulus used by rsa encryption
+        parity_oracle (function): fucntion which decrypts the ciphertext and
+            returns true if the ciphertext is even, odd otherwise
+    returns:
+        int: decrypted ciphertext
+    """
+    lower_bound = 0
+    upper_bound = modulus
+
+    while lower_bound != upper_bound:
+        
+        ciphertext = (nt.modexp(2, e, modulus)*ciphertext)        
+        difference = upper_bound - lower_bound
+
+        if difference % 2 == 1:
+            difference += 1
+
+        if parity_oracle(ciphertext):
+            upper_bound = upper_bound - difference//2
+        
+        else:
+            lower_bound = lower_bound + difference//2
+        
+        #Uncomment for hollywood style hacking
+        #print(upper_bound)
+
+    return upper_bound
+        

@@ -29,7 +29,11 @@ class RSAServer():
         self.d = nt.invmod(e, totient)
 
     def send_public_key(self):
-        #output the public keyt for the client
+        """output the public keyt for the client
+        returns:
+            int: e value in rsa
+            int: modulus = p*q in rsa
+        """
         return self.e, self.n
 
     def decrypt(self, ciphertext):
