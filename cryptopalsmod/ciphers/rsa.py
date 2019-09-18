@@ -3,24 +3,18 @@ from cryptopalsmod import number_theory as nt
 
 class RSAServer():
 
-    def __init__(self, e = 3, prime_pair = None):
+    def __init__(self, e = 3, prime_size = 1024):
 
-        if prime_pair == None:
 
-            p = number.getPrime(1024)
-            q = number.getPrime(1024)
-
-        else:
-
-            p = prime_pair[0]
-            q = prime_pair[1]
+        p = number.getPrime(prime_size)
+        q = number.getPrime(prime_size)
 
         #gcd(e, (p-1)*(q-1)) needs to be 1 for the algorithm to work
 
         while nt.gcd(e, p - 1) > 1:
-            p = number.getPrime(1024)
+            p = number.getPrime(prime_size)
         while nt.gcd(e, q - 1) > 1:
-            q = number.getPrime(1024)
+            q = number.getPrime(prime_size)
 
 
         self.e = e
