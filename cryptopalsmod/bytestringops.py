@@ -267,6 +267,9 @@ def int_to_bytes(number):
             return number.to_bytes(start_length, byteorder='big')
         except OverflowError:
             start_length += 1
-        
 
+def byte_len(number):
+    
+    return (number.bit_length() + 7)//8
+    
 
