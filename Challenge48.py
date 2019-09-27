@@ -25,6 +25,5 @@ def main():
     assert plaintext.to_bytes(bso.byte_len(mod), 'big') == server.decrypt_to_bytes_and_check_padding(ciphertext)
 
 if __name__ == "__main__":
-    for num in range(0,100):
-        main()
-        print(num)
+    main()
+    
